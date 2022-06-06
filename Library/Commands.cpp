@@ -1,4 +1,5 @@
 #include<iostream>
+#include<cstring>
 #include "Library.h"
 #include "Commands.h"
 
@@ -11,11 +12,12 @@ bool Commands::login()
 	std::cin.ignore();
 	std::cin.getline(username, MAXLENGHT);
 	std::cout << "Password: ";
-	std::cin.ignore();
+	//std::cin.ignore();
 	std::cin.getline(password, MAXLENGHT);
 
 	if (strcmp(username, this->USERNAME) == 0 &&
 		strcmp(password, this->PASSWORD) == 0) {
+        std::cout << "You logged in successfully!\n";
 		return true;
 	}
 
@@ -29,22 +31,19 @@ void Commands::addBook(Library& library, bool isAdministrator)
 	if (isAdministrator) {
 		char author[1028];
 		std::cout << "Author: ";
-		std::cin.ignore();
+        std::cin.ignore();
 		std::cin.getline(author, MAXLENGHT);
 
 		char title[1028];
 		std::cout << "Title: ";
-		std::cin.ignore();
 		std::cin.getline(title, MAXLENGHT);
 
 		char fileNameBook[1028];
 		std::cout << "File name: ";
-		std::cin.ignore();
 		std::cin.getline(fileNameBook, MAXLENGHT);
 
 		char description[1028];
 		std::cout << "Description: ";
-		std::cin.ignore();
 		std::cin.getline(description, MAXLENGHT);
 
 		bool isValidRating = true;
@@ -63,7 +62,6 @@ void Commands::addBook(Library& library, bool isAdministrator)
 
 		char isbn[1028];
 		std::cout << "ISBN code: ";
-		std::cin.ignore();
 		std::cin.getline(isbn, MAXLENGHT);
 
 		Book book = library.addBook(Book(
@@ -106,14 +104,13 @@ void Commands::sortBooks(Library& library)
 	do
 	{
 		std::cout << "Enter your choose: ";
-		std::cin.ignore();
 		std::cin >> choosen;
 
-		if (choosen < 1 || choosen > 3) {
+		if (choosen < '1' || choosen > '3') {
 			std::cout << "There is not such criterian! Try again!\n";
 		}
 
-	} while (choosen < 1 || choosen > 3);
+	} while (choosen < '1' || choosen > '3');
 
 	if (choosen == '1') {
 		library.sortBooks("author");
@@ -143,11 +140,11 @@ void Commands::findBook(Library& library)
 		std::cin.ignore();
 		std::cin >> choosen;
 
-		if (choosen < 1 || choosen > 4) {
+		if (choosen < '1' || choosen > '4') {
 			std::cout << "There is not such criterian! Try again!\n";
 		}
 
-	} while (choosen < 1 || choosen > 4);
+	} while (choosen < '1' || choosen > '4');
 
 	char query[1028];
 	std::cout << "Enter a text which will be searching: ";
@@ -258,7 +255,7 @@ void Commands::startProgram()
 			std::cout << "There is not this command!\n";
 		}
 
-		std::cout << "Commands:\n"
+		std::cout << "\nCommands:\n"
 			<< "[1] Log in like administrator\n"
 			<< "[2] Sorted list of books\n"
 			<< "[3] Searching book by criterian\n"

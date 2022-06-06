@@ -1,4 +1,5 @@
 #include<iostream>
+#include<cstring>
 #include "Book.h"
 
 void Book::copy(const Book& other)
@@ -6,7 +7,7 @@ void Book::copy(const Book& other)
 	this->setAuthor(other.getAuthor());
 	this->setTitle(other.getTitle());
 	this->setFileName(other.getFileName());
-	this->setDescription(this->getDescription());
+	this->setDescription(other.getDescription());
 	this->setRating(other.getRating());
 	this->setISBN(other.getISBN());
 }
@@ -41,6 +42,7 @@ Book::Book()
 
 Book::Book(char* author, char* title, char* fileName, char* description, double rating, char* isbn)
 {
+
 	this->setAuthor(author);
 	this->setTitle(title);
 	this->setFileName(fileName);
@@ -76,15 +78,18 @@ char* Book::getAuthor() const
 
 void Book::setAuthor(const char* author)
 {
-	if (this->author != nullptr) {
+	/*if (this->author != nullptr && strlen(this->author) > 0) {
 		delete[] this->author;
 		this->author = nullptr;
-	}
+	}*/
 
 	if(author != nullptr) {
 		this->author = new char[strlen(author) + 1];
 		strcpy_s(this->author, strlen(author) + 1, author);
 	}
+    else{
+        this->author = nullptr;
+    }
 }
 
 char* Book::getTitle() const
@@ -94,15 +99,18 @@ char* Book::getTitle() const
 
 void Book::setTitle(const char* title)
 {
-	if (this->title != nullptr) {
+	/*if (this->title != nullptr) {
 		delete[] this->title;
 		this->title = nullptr;
-	}
+	}*/
 
 	if (title != nullptr) {
 		this->title = new char[strlen(title) + 1];
 		strcpy_s(this->title, strlen(title) + 1, title);
 	}
+    else {
+        this->title = nullptr;
+    }
 }
 
 char* Book::getDescription() const
@@ -112,15 +120,18 @@ char* Book::getDescription() const
 
 void Book::setDescription(const char* description)
 {
-	if (this->description != nullptr) {
+	/*if (this->description != nullptr) {
 		delete[] this->description;
 		this->description = nullptr;
-	}
+	}*/
 
 	if (description != nullptr) {
 		this->description = new char[strlen(description) + 1];
 		strcpy_s(this->description, strlen(description) + 1, description);
 	}
+    else {
+        this->description = nullptr;
+    }
 }
 
 double Book::getRating() const
@@ -145,15 +156,18 @@ char* Book::getISBN() const
 
 void Book::setISBN(const char* isbn)
 {
-	if (this->isbn != nullptr) {
+	/*if (this->isbn != nullptr) {
 		delete[] this->isbn;
 		this->isbn = nullptr;
-	}
+	}*/
 
 	if (isbn != nullptr) {
 		this->isbn = new char[strlen(isbn) + 1];
-		strcpy_s(this->isbn, strlen(isbn) + 1, isbn);
+        strcpy_s(this->isbn, strlen(isbn) + 1, isbn);
 	}
+    else {
+        this->isbn = nullptr;
+    }
 }
 
 char* Book::getFileName() const
@@ -163,68 +177,76 @@ char* Book::getFileName() const
 
 void Book::setFileName(const char* fileName)
 {
-	if (this->fileName != nullptr) {
+	/*if (this->fileName != nullptr) {
 		delete[] this->fileName;
 		this->fileName = nullptr;
-	}
+	}*/
 
 	if (fileName != nullptr) {
 		this->fileName = new char[strlen(fileName) + 1];
 		strcpy_s(this->fileName, strlen(fileName) + 1, fileName);
 	}
+    else {
+        this->fileName = nullptr;
+    }
 }
 
 void Book::pullInfoFromFile(std::istream& in)
 {
 	unsigned int authorLength;
 	in.read((char*)&authorLength, sizeof(authorLength));
-	this->author = new char[authorLength];
+	this->author = new char[authorLength + 1];
 	in.read(this->author, authorLength);
+    this->author[authorLength] = '\0';
 
 	unsigned int titleLength;
 	in.read((char*)&titleLength, sizeof(titleLength));
-	this->title = new char[titleLength];
+	this->title = new char[titleLength + 1];
 	in.read(this->title, titleLength);
+    this->title[titleLength] = '\0';
+
+    unsigned int filenameLength;
+    in.read((char*)&filenameLength, sizeof(filenameLength));
+    this->fileName = new char[filenameLength + 1];
+    in.read(this->fileName, filenameLength);
+    this->fileName[filenameLength] = '\0';
 
 	unsigned int descriptionLength;
 	in.read((char*)&descriptionLength, sizeof(descriptionLength));
-	this->description = new char[descriptionLength];
+	this->description = new char[descriptionLength + 1];
 	in.read(this->description, descriptionLength);
+    this->description[descriptionLength] = '\0';
 
 	in.read((char*)&this->rating, sizeof(this->rating));
 
 	unsigned int ISBNLength;
 	in.read((char*)&ISBNLength, sizeof(ISBNLength));
-	this->isbn = new char[ISBNLength];
+	this->isbn = new char[ISBNLength + 1];
 	in.read(this->isbn, ISBNLength);
-
-	unsigned int filenameLength;
-	in.read((char*)&filenameLength, sizeof(filenameLength));
-	this->fileName = new char[filenameLength];
-	in.read(this->fileName, filenameLength);
+    this->isbn[ISBNLength] = '\0';
 }
 
 std::ofstream& operator<<(std::ofstream& out, const Book& book)
 {
-	unsigned int authorLength = std::strlen(book.author) + 1;
-	out.write((const char*)&authorLength, sizeof(authorLength));
-	out.write((const char*)book.author, authorLength);
+	unsigned int authorLength = std::strlen(book.author);
+	out.write((char*)&authorLength, sizeof(authorLength));
+	out.write((char*)book.author, authorLength);
 
-	unsigned int titleLength = std::strlen(book.title) + 1;
-	out.write((const char*)&titleLength, sizeof(titleLength));
-	out.write((const char*)book.title, titleLength);
+	unsigned int titleLength = std::strlen(book.title);
+	out.write((char*)&titleLength, sizeof(titleLength));
+	out.write((char*)book.title, titleLength);
 
-	unsigned int descriptionLength = std::strlen(book.description) + 1;
-	out.write((const char*)&descriptionLength, sizeof(descriptionLength));
-	out.write((const char*)book.description, descriptionLength);
+	unsigned int descriptionLength = std::strlen(book.description);
+	out.write((char*)&descriptionLength, sizeof(descriptionLength));
+	out.write((char*)book.description, descriptionLength);
 
-	out.write((const char*)&book.rating, sizeof(book.rating));
+	out.write((char*)&book.rating, sizeof(book.rating));
 
-	unsigned int ISBNLength = std::strlen(book.isbn) + 1;
+	unsigned int ISBNLength = std::strlen(book.isbn);
 	out.write((const char*)&ISBNLength, sizeof(ISBNLength));
 	out.write((const char*)book.isbn, ISBNLength);
 
-	unsigned int fileNameLength = std::strlen(book.fileName) + 1;
+	unsigned int fileNameLength = std::strlen(book.fileName);
 	out.write((const char*)&fileNameLength, sizeof(fileNameLength));
 	out.write((const char*)book.fileName, fileNameLength);
 

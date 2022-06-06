@@ -1,4 +1,5 @@
 #include<iostream>
+#include<cstring>
 #include "Library.h"
 
 
@@ -42,7 +43,7 @@ void Library::updateFile() const
 	std::ofstream out;
 	out.open(this->fileName);
 	if (out) {
-		out.write((const char*)&this->size, sizeof(this->size));
+		out.write((char*)&this->size, sizeof(this->size));
 		for (unsigned i = 0; i < this->size; ++i) {
 			out << this->books[i];
 		}
@@ -60,18 +61,22 @@ Library::Library()
 
 Library::Library(const char* fileInfo)
 {
+    this->fileName = nullptr;
 	this->setFileName(fileInfo);
 
-	std::ifstream in;
+    std::ifstream in;
 	in.open(fileInfo, std::ios::binary);
 	if (in) {
 		unsigned booksCount;
 		in.read((char*)&booksCount, sizeof(booksCount));
 
+        this->setSize(booksCount);
+        this->books = new Book [booksCount];
+
 		for (unsigned i = 0; i < booksCount; ++i) {
 			Book book;
 			book.pullInfoFromFile(in);
-			this->addBook(book);
+            this->books[i] = book;
 		}
 	}
 	in.close();
@@ -141,14 +146,14 @@ void Library::setSize(unsigned size)
 
 Book& Library::addBook(const Book& book)
 {
-	++this->size;
+	this->setSize(this->size + 1);
 
-	Book* arr = new Book[this->size + 1];
+	Book* arr = new Book[this->size];
 
-	for (unsigned i = 0; i < this->size; ++i) {
+	for (unsigned i = 0; i < this->size - 1; ++i) {
 		arr[i] = this->books[i];
 	}
-	arr[this->size] = book;
+	arr[this->size - 1] = book;
 
 	delete[] this->books;
 	this->books = arr;
@@ -165,10 +170,10 @@ Book* Library::findBook(char* query, const char* criterian)
 	char* toLowerQuery = toLower(query);
 
 	for (unsigned i = 0; !isFind && i < this->size; ++i) {
-		if (criterian == "author") {
+		if (strcmp(criterian, "author") == 0) {
 			char* toLowerAuthor = toLower(this->books[i].getAuthor());
 
-			if (strcmp(toLowerQuery, toLowerAuthor)) {
+			if (strcmp(toLowerQuery, toLowerAuthor) == 0) {
 				isFind = true;
 				index = i;
 			}
@@ -176,10 +181,10 @@ Book* Library::findBook(char* query, const char* criterian)
 			delete[] toLowerAuthor;
 			toLowerAuthor = nullptr;
 		}
-		else if (criterian == "title") {
+		else if (strcmp(criterian, "title") == 0) {
 			char* toLowerTitle = toLower(this->books[i].getTitle());
 
-			if (strcmp(toLowerTitle, toLowerQuery)) {
+			if (strcmp(toLowerTitle, toLowerQuery) == 0) {
 				isFind = true;
 				index = i;
 			}
@@ -187,10 +192,10 @@ Book* Library::findBook(char* query, const char* criterian)
 			delete[] toLowerTitle;
 			toLowerTitle = nullptr;
 		}
-		else if (criterian == "isbn") {
+		else if (strcmp(criterian, "isbn") == 0) {
 			char* toLowerISBN = toLower(query);
 
-			if (strcmp(toLowerQuery, toLowerISBN)) {
+			if (strcmp(toLowerQuery, toLowerISBN) == 0) {
 				isFind = true;
 				index = i;
 			}
@@ -198,10 +203,10 @@ Book* Library::findBook(char* query, const char* criterian)
 			delete[] toLowerISBN;
 			toLowerISBN = nullptr;
 		}
-		else if (criterian == "description") {
+		else if (strcmp(criterian, "description") == 0) {
 			char* toLowerDescription = toLower(this->books[i].getDescription());
 			
-			if (strstr(toLowerDescription, toLowerQuery)) {
+			if (strstr(toLowerDescription, toLowerQuery) == 0) {
 				isFind = true;
 				index = i;
 			}
@@ -267,17 +272,17 @@ void Library::sortBooks(const char* criterian)
 		for (unsigned j = i + 1; isCriterianValid && j < this->size; ++j) {
 			bool hasSwap = false;
 
-			if (criterian == "author") {
+			if (strcmp(criterian, "author") == 0) {
 				if (strcmp(this->books[i].getAuthor(), this->books[j].getAuthor()) > 0) {
 					hasSwap = true;
 				}
 			}
-			else if (criterian == "title") {
+			else if (strcmp(criterian, "title") == 0) {
 				if (strcmp(this->books[i].getTitle(), this->books[j].getTitle()) > 0) {
 					hasSwap = true;
 				}
 			}
-			else if (criterian == "rating") {
+			else if (strcmp(criterian, "rating") == 0) {
 				if (this->books[i].getRating() > this->books[j].getRating()) {
 					hasSwap = true;
 				}

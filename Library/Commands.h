@@ -3,7 +3,7 @@
 
 class Commands {
 private:
-    const char* BOOKSFILENAME = "books.bin";
+    const char* BOOKSFILENAME = "books.dat";
     const char* USERNAME = "admin";
     const char* PASSWORD = "Admin123!";
     const int MAXLENGHT = 1028;
